@@ -1,94 +1,86 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+//Executando o express
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
+//Configurando o Body Parser
+//Ele permite ter o body no req.
+//Dessa forma consigo ler o JSON do body da requisição
 const jsonParser = bodyParser.json();
 app.use(jsonParser);
 
-app.get('/', (req, res) => {
-    res.send('Hello world!');
-});
-
-// Endpoints de envio de mensagens
-// CRUD -> Create, Read (Read All e Read Single), Update and Delete
-// CRUD -> Criar, Ler (Ler tudo e ler individualmente), atualizar e remover
-
+//Endpoints de envio de mensagens
+//CRUD - Create, Read(Read All e Read Single), Update and Delete
 const mensagens = [
     {
         id: 0,
-        texto: "Essa é uma mensagem"
+        texto: 'Cachorro quente'
+
     },
     {
         id: 1,
-        texto: "Essa é outra mensagem"
-    },
+        texto: 'Sushi'
+    }  
 ];
 
-// Read All
-app.get('/mensagens', (req, res) => {
-    res.json(mensagens.filter(Boolean));
+app.get('/', (req, res) => {
+    res.send('Hello, Adria');
 });
 
-// Create
+//Read All
+app.get('/mensagens', (req, res) => {
+    res.json(mensagens);    
+});
+
+//Create
 app.post('/mensagens', (req, res) => {
-    // Obtendo a mensagem que foi recebida através do body da requisição
+    //Adquiro o objeto do corpo
     const mensagem = req.body;
-
-    // Obtendo o ID da nova mensagem
+    //Capturando o tamanho do objeto mensagens
     const id = mensagens.length;
-
-    // Atualiza o objeto de mensagem enviado pela requisição com o ID que foi calculado
+    //adicionando o campo id na nova mensagem
     mensagem.id = id;
-
-    // Insiro a mensagem na lista de mensagens
+    //Insiro a mensagem na lista
     mensagens.push(mensagem);
 
-    // Envio a mensagem de sucesso, informando o ID obtido
-    res.send(`A mensagem com o texto '${mensagem.texto}' foi criada com sucesso. ID: ${id}.`);
+    res.send(`A sua mensagem ${mensagem.texto} foi adicionada. ID: ${id}`);
 });
 
-// Read Single
+//Read Single
 app.get('/mensagens/:id', (req, res) => {
-    // Pega o ID através dos parâmetros da requisição
+    //Acessando o id
     const id = req.params.id;
-
-    // Acessamos a mensagem de acordo com o ID informado
+    //Identificando qual é a mensagem pelo o id
     const mensagem = mensagens[id];
 
-    res.json(mensagem);
-    
-    /*
-    // Referência, passando também o ID em um objeto de mensagem
-    res.json({ id, mensagem });
-    */
+    res.json(`${mensagem.texto}`);
 });
 
-// Update
+//Update
 app.put('/mensagens/:id', (req, res) => {
-    // Acessa o ID pelos parâmetros
+    // Acessando o paramentro id
     const id = req.params.id;
-
-    // Obtém a mensagem que foi enviada pelo usuário no corpo (body) da requisição
+    //Capturando a nova mensagem do body da requisição
     const novoTexto = req.body.texto;
-
-    // Atualiza a mensagem direto na lista de mensagens, acessando pelo ID que foi informado
+    //Atualizando a nova mensagem ao objeto especificado pelo id
     mensagens[id].texto = novoTexto;
 
-    // Envia uma mensagem de sucesso.
-    res.send(`Mensagem com o ID ${id} foi atualizada com sucesso.`);
+    res.send(`Mensagem com id ${id} foi atualizada. ${mensagens[id].texto}`);
 });
 
-// Delete
+//Delete
 app.delete('/mensagens/:id', (req, res) => {
+    // Acessando o paramentro id
     const id = req.params.id;
-
+    //Deltando a mensagem com o id selecionado
     delete mensagens[id];
 
-    res.send(`Mensagem com o ID ${id} foi removida com sucesso.`);
+    res.send(`Mensagem de id ${id} apagada`);
 });
 
+//Ouvindo a porta e recebendo suas requisições
 app.listen(port, () => {
-    console.log(`App rodando em http://localhost:${port}`);
-});
+    console.log(`Listening on port http://localhost:${port}`);
+})
